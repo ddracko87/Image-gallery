@@ -1,0 +1,52 @@
+Fitur Tambahan yang Bisa Ditambahkan
+Berikut ini beberapa fitur tambahan yang dapat diperhatikan untuk meningkatkan aplikasi:
+
+1. Unggah Gambar:
+
+Pengguna dapat mengunggah gambar baru ke folder tertentu.
+Fungsionalitas ini akan memerlukan pengembangan pada backend untuk menerima dan menyimpan file yang diunggah.
+
+2.Filtering dan Pencarian Gambar:
+
+Kemampuan untuk mencari atau memfilter gambar berdasarkan nama, metadata, atau tipe file.
+Ini dapat melibatkan pemrograman frontend dan backend untuk menangani query pencarian dan mengembalikan hasil yang sesuai.
+
+3.Akses Kontrol Pengguna:
+
+Menambahkan peran pengguna (admin, viewer) dengan hak akses yang berbeda.
+Misalnya, hanya admin yang dapat mengunggah atau menghapus gambar, sementara viewer hanya dapat melihat dan memperbesar gambar.
+
+4.Audit Log:
+
+Melacak aktivitas pengguna seperti unggah, menghapus, login, logout, dll.
+Fitur ini bisa sangat berguna untuk monitoring kegiatan dalam aplikasi dan menjaga keamanan data.
+
+5.Responsive Design:
+
+Memastikan tampilan aplikasi terlihat baik di berbagai perangkat dan ukuran layar.
+Ini melibatkan pemrograman CSS dan mungkin JavaScript untuk menyesuaikan layout secara dinamis.
+
+6.Thumbnail Gambar:
+
+Menampilkan thumbnail gambar dalam halaman galery yang lebih kecil dari gambar aslinya.
+Ini dapat meningkatkan performa aplikasi dan mempermudah pengguna dalam menavigasi gambar.
+
+7.Optimasi Gambar:
+
+Melakukan kompresi atau optimisasi gambar untuk mengurangi ukuran file tanpa mengurangi kualitas.
+Fitur ini akan memerlukan pemrograman backend untuk memproses dan menyimpan file yang dioptimalkan.
+
+8.Komentar pada Gambar:
+
+Pengguna dapat menambahkan komentar atau deskripsi ke gambar tertentu.
+Ini melibatkan pengembangan database untuk menyimpan komentar dan frontend untuk menampilkan dan menambahkannya.
+
+9.Notifikasi:
+
+Mengirim notifikasi kepada pengguna tentang aktivitas tertentu, seperti unggah atau menghapus gambar.
+Fitur ini bisa menggunakan teknologi seperti WebSocket atau email notification.
+
+10.Backup Data:
+
+Melakukan backup gambar secara teratur untuk mencegah kehilangan data.
+Ini melibatkan pemrograman backend untuk menangani proses backup dan menyimpannya di lokasi yang aman.

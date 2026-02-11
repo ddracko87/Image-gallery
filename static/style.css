@@ -191,8 +191,43 @@ ul li:hover {
 }
 
 /* Sedikit styling untuk username yang muncul di header */
-.username-display {
-    float: right;
-    color: #03dac6; /* Warna teal */
+/* --- HEADER & LOGOUT FIX --- */
+.header-container {
+    display: flex;
+    justify-content: space-between; /* Judul kiri, Logout kanan */
+    align-items: center;
+    background: #1e1e1e;
+    padding: 15px 25px;
+    border-radius: 12px;
+    margin-bottom: 25px;
+    border: 1px solid #333;
+}
+
+.header-left h1 {
+    margin: 0;
+    font-size: 1.6rem;
+    border: none; /* Menghilangkan garis bawah default */
+    display: inline-block;
+}
+
+.user-greeting {
+    color: #03dac6; /* Hijau Teal */
+    margin-left: 15px;
     font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.logout-button {
+    background-color: #ff4d4d !important; /* Merah terang */
+    color: white !important;
+    padding: 8px 18px;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: bold;
+    transition: 0.3s ease;
+}
+
+.logout-button:hover {
+    background-color: #cc0000 !important;
+    transform: scale(1.05);
 }

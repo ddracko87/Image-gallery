@@ -6,17 +6,17 @@
     <link rel="stylesheet" href="/static/style.css?v=20240726">
 </head>
 <body>
-    <header style="display: flex; justify-content: space-between; align-items: center;">
-        <h1>Pilih Folder <span class="username-display">Halo, {{ username }}</span></h1>
-        <nav>
-            <!-- Gunakan onclick untuk memberikan konfirmasi atau pembersihan tambahan -->
-            <a href="/logout" 
-               onclick="return confirm('Apakah Anda yakin ingin logout?');" 
-               style="color: white; background-color: #ff4d4d; padding: 8px 15px; text-decoration: none; border-radius: 5px; font-weight: bold;">
-               ➡️ Logout
-            </a>
-        </nav>
-    </header>
+<header class="header-container">
+    <div class="header-left">
+        <h1>Pilih Folder</h1>
+        <span class="user-greeting">Halo, {{ username }}</span>
+    </div>
+    <div class="header-right">
+        <a href="/logout" onclick="return confirm('Logout?');" class="logout-button">
+            ➡️ Logout
+        </a>
+    </div>
+</header>
 
     <ul class="folder-list">
         {% for folder in folders %}

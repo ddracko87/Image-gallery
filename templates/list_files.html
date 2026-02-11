@@ -6,6 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Galeri: {{ folder_name }}</title>
     <link rel="stylesheet" href="/static/style.css?v=20240726">
+    <style>
+        /* Tambahan style manual agar tampilan rapi */
+        .thumb-img.active { border-color: #007bff !important; opacity: 1; }
+        .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); align-items: center; justify-content: center; }
+        .modal-content { max-width: 90%; max-height: 85%; border: 3px solid white; border-radius: 5px; }
+        #caption { color: white; margin-top: 15px; font-weight: bold; }
+        .close { position: absolute; top: 20px; right: 35px; color: white; font-size: 40px; font-weight: bold; cursor: pointer; }
+    </style>
 </head>
 <body>
     <nav>
@@ -15,159 +23,156 @@
     
     <h1>Galeri: {{ folder_name }}</h1>
 
-    <!-- --- BAGIAN BARU: Tampilkan Subfolder --- -->
     {% if subfolders %}
     <h2>Subfolder:</h2>
     <ul>
-    {% for subfolder in subfolders %}
-        <!-- Hapus garis miring di awal tautan relatif -->
-        <li><a href="/gallery/{{ folder_name }}/{{ subfolder }}">{{ subfolder }}</a></li>
-    {% endfor %}
-</ul>
+        {% for subfolder in subfolders %}
+            <li><a href="/gallery/{{ folder_name }}/{{ subfolder }}">{{ subfolder }}</a></li>
+        {% endfor %}
+    </ul>
     <hr>
     {% endif %}
 
     <h2>Gambar:</h2>
-<div class="gallery-container">
-        <!-- Loop gambar yang sudah ada -->
-        {% for file_url in files %}
-    <div class="gallery-item">
-        <img src="{{ file_url }}" 
-             alt="Gambar Galeri"
-             loading="lazy" 
-             onclick="openModal('{{ file_url }}')" 
-             style="cursor: pointer;"> <!-- Tambahkan pointer agar user tahu bisa diklik -->
-             <button onclick="deleteImage('{{ file_url }}')">Hapus</button>
+
+    <div class="gallery-wrapper" style="max-width: 800px; margin: 0 auto; padding: 20px;">
+        <!-- 1. Tampilan Gambar Utama (Klik untuk Popup) -->
+        <div class="main-display" style="width: 100%; margin-bottom: 20px; text-align: center;">
+            {% if files %}
+                <img id="active-image" src="{{ files[0] }}" alt="Main View" 
+                     onclick="openLightbox()" 
+                     style="width: 100%; max-height: 500px; object-fit: contain; border-radius: 8px; border: 1px solid #444; cursor: zoom-in;">
+            {% endif %}
+        </div>
+
+        <!-- 2. Barisan Thumbnail -->
+        <div class="thumbnail-container" style="display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; scroll-behavior: smooth;">
+            {% for file_url in files %}
+            <div class="thumb-item" style="flex: 0 0 100px; display: flex; flex-direction: column; align-items: center;">
+                <img class="thumb-img {% if loop.first %}active{% endif %}" 
+                     src="{{ file_url }}" 
+                     onclick="updatePreview(this, {{ loop.index0 }})"
+                     style="width: 100px; height: 100px; object-fit: cover; cursor: pointer; border-radius: 4px; border: 2px solid transparent; transition: 0.2s;">
+                
+                <button onclick="deleteImage('{{ file_url }}')" 
+                        style="margin-top: 5px; width: 100%; background: #ff4444; color: white; border: none; border-radius: 3px; font-size: 11px; cursor: pointer;">
+                    Hapus
+                </button>
+            </div>
+            {% endfor %}
+        </div>
     </div>
-        {% endfor %}
-</div>
-<!-- KONTROL PAGINATION BARU -->
+
+    <!-- Pagination -->
     <div class="pagination-controls" style="margin-top: 20px; text-align: center;">
-        {% if has_prev %}
-            <a href="{{ prev_url }}" style="padding: 10px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">
-                &laquo; Previous Page
-            </a>
-        {% else %}
-            <!-- Tombol dinonaktifkan jika tidak ada halaman sebelumnya -->
-            <span style="padding: 10px; background-color: #aaa; color: white; border-radius: 5px; cursor: not-allowed;">
-                &laquo; Previous Page
-            </span>
-        {% endif %}
-
+        {% if has_prev %}<a href="{{ prev_url }}" style="padding: 10px; background: #007bff; color: white; text-decoration: none; border-radius: 5px;">&laquo; Prev</a>{% endif %}
         <span style="margin: 0 15px;">Page {{ page }}</span>
-
-        {% if has_next %}
-            <a href="{{ next_url }}" style="padding: 10px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">
-                Next Page &raquo;
-            </a>
-        {% else %}
-             <!-- Tombol dinonaktifkan jika tidak ada halaman berikutnya -->
-            <span style="padding: 10px; background-color: #aaa; color: white; border-radius: 5px; cursor: not-allowed;">
-                Next Page &raquo;
-            </span>
-        {% endif %}
+        {% if has_next %}<a href="{{ next_url }}" style="padding: 10px; background: #007bff; color: white; text-decoration: none; border-radius: 5px;">Next &raquo;</a>{% endif %}
     </div>
 
-    <!-- --- BAGIAN BARU: STRUKTUR MODAL/LIGHTBOX --- -->
+    <!-- Lightbox Modal -->
     <div id="imageModal" class="modal">
-    <span class="close" onclick="closeModal()">&times;</span>
-    
-    <!-- Tambahkan Panah Navigasi di Sini -->
-    <a class="prev" onclick="changeImage(-1)">&#10094;</a>
-    <a class="next" onclick="changeImage(1)">&#10095;</a>
-
-    <img class="modal-content" id="img01">
-    <div id="caption"></div>
-</div>
-    <!-- --- AKHIR BAGIAN BARU --- -->
-
-    <!-- --- BAGIAN BARU: SCRIPT JAVASCRIPT --- -->
-    <script>
-        var modal = document.getElementById("imageModal");
-        var modalImg = document.getElementById("img01");
-        // Dapatkan elemen caption
-        var captionText = document.getElementById("caption");
+        <span class="close" onclick="closeModal()">&times;</span>
         
-        var galleryItems = document.querySelectorAll('.gallery-item img');
-        var imageUrls = Array.from(galleryItems).map(img => img.src);
-        var currentIndex = 0;
+        <!-- Tombol Navigasi Kiri & Kanan -->
+        <!-- <a class="prev-btn" onclick="navigateModal(-1)" style="position: absolute; left: 20px; color: white; font-size: 50px; cursor: pointer; user-select: none; z-index: 2100;">❮</a> -->
+        <!-- <a class="next-btn" onclick="navigateModal(1)" style="position: absolute; right: 20px; color: white; font-size: 50px; cursor: pointer; user-select: none; z-index: 2100;">❯</a> -->
+        
+        <!-- Gunakan class dari CSS kamu: .prev dan .next -->
+        <a class="prev" onclick="navigateModal(-1)">❮</a>
+        <a class="next" onclick="navigateModal(1)">❯</a>
+        <div style="display: flex; flex-direction: column; align-items: center; width: 100%;">
+            <img class="modal-content" id="img01">
+            <div id="caption"></div>
+        </div>
+    </div>
 
-        // Fungsi utilitas untuk mengekstrak nama file dari URL
-        function extractFilename(url) {
-            // Mengambil bagian setelah slash terakhir
-            var filename = url.substring(url.lastIndexOf('/') + 1);
-            // Mendekode URL-encoded characters (%20 menjadi spasi, dll)
-            return decodeURIComponent(filename);
-        }
+<script>
+    // Inisialisasi daftar gambar dari template Jinja2
+    const imageUrls = [{% for file_url in files %}"{{ file_url }}"{% if not loop.last %}, {% endif %}{% endfor %}];
+    let currentIndex = 0;
 
-        function openModal(imageUrl) {
-            modal.style.display = "flex";
-            modalImg.src = imageUrl;
-            currentIndex = imageUrls.indexOf(imageUrl);
-            // Set caption saat modal dibuka
-            captionText.innerHTML = extractFilename(imageUrl);
-        }
+    // 1. Fungsi Ganti Preview Gambar Utama
+    function updatePreview(element, index) {
+        currentIndex = index;
+        const mainImg = document.getElementById('active-image');
+        mainImg.src = element.src;
 
-        function closeModal() {
-            modal.style.display = "none";
-        }
-
-        function changeImage(delta) {
-            currentIndex += delta;
-
-            if (currentIndex >= imageUrls.length) {
-                currentIndex = 0;
-            } else if (currentIndex < 0) {
-                currentIndex = imageUrls.length - 1;
-            }
-
-            var newImageUrl = imageUrls[currentIndex];
-            modalImg.src = newImageUrl;
-            // Set caption saat gambar berubah
-            captionText.innerHTML = extractFilename(newImageUrl);
-        }
-
-        // Tutup modal jika user klik di luar konten gambar
-        window.onclick = function(event) {
-            if (event.target == modal) {
-                closeModal();
-            }
-        }
-    document.addEventListener('keydown', function(e) {
-    if (modal.style.display === "flex") {
-        if (e.key === "ArrowLeft") changeImage(-1);
-        if (e.key === "ArrowRight") changeImage(1);
-        if (e.key === "Escape") closeModal();
+        // Update styling thumbnail aktif
+        document.querySelectorAll('.thumb-img').forEach(img => img.classList.remove('active'));
+        element.classList.add('active');
     }
-});
 
- function deleteImage(relativeFilePath) {
+    // 2. Fungsi Buka Modal (Popup)
+    function openLightbox() {
+        const modal = document.getElementById("imageModal");
+        const modalImg = document.getElementById("img01");
+        const captionText = document.getElementById("caption");
 
+        modal.style.display = "flex";
+        modalImg.src = imageUrls[currentIndex];
+        
+        // Ambil nama file untuk caption
+        let filename = imageUrls[currentIndex].substring(imageUrls[currentIndex].lastIndexOf('/') + 1);
+        captionText.innerHTML = decodeURIComponent(filename);
+    }
+
+    function closeModal() {
+        document.getElementById("imageModal").style.display = "none";
+    }
+
+    // 3. Fungsi Hapus
+    function deleteImage(relativeFilePath) {
         if (confirm("Apakah Anda yakin ingin menghapus gambar ini?")) {
-            // 1. Hapus prefix '/view/' jika ada agar sesuai dengan IMAGE_DIRECTORY di backend
-                let cleanPath = relativeFilePath;
-                if (cleanPath.startsWith('/view/')) {
-                    cleanPath = cleanPath.replace('/view/', '');
-                }
-
-                // 2. Encode path-nya
-                const encodedPath = encodeURIComponent(cleanPath);
-            fetch(`/files/${encodedPath}`, { method: 'DELETE' })
-                .then(response => {
-                    if (response.ok) {
-                        location.reload(); // Muat ulang halaman setelah penghapusan
-                    } else {
-                        alert("Gagal menghapus gambar.");
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert("Terjadi kesalahan saat menghapus gambar.");
-                });
+            let cleanPath = relativeFilePath.replace('/view/', '');
+            fetch(`/files/${encodeURIComponent(cleanPath)}`, { method: 'DELETE' })
+                .then(response => response.ok ? location.reload() : alert("Gagal menghapus."));
         }
     }
-    </script>
-    <!-- --- AKHIR BAGIAN BARU --- -->
 
+    // Tutup modal jika klik luar gambar
+    window.onclick = function(event) {
+        const modal = document.getElementById("imageModal");
+        if (event.target == modal) closeModal();
+    }
+
+    function navigateModal(step) {
+        currentIndex += step;
+
+        // Putar balik jika sudah di ujung list
+        if (currentIndex >= imageUrls.length) {
+            currentIndex = 0;
+        } else if (currentIndex < 0) {
+            currentIndex = imageUrls.length - 1;
+        }
+
+        const modalImg = document.getElementById("img01");
+        const captionText = document.getElementById("caption");
+        
+        const newUrl = imageUrls[currentIndex];
+        modalImg.src = newUrl;
+        
+        // Update caption
+        let filename = newUrl.substring(newUrl.lastIndexOf('/') + 1);
+        captionText.innerHTML = decodeURIComponent(filename);
+
+        // Sinkronkan thumbnail aktif di latar belakang (opsional)
+        const thumbs = document.querySelectorAll('.thumb-img');
+        const mainImg = document.getElementById('active-image');
+        mainImg.src = newUrl;
+        thumbs.forEach(img => img.classList.remove('active'));
+        thumbs[currentIndex].classList.add('active');
+    }
+
+    // Tambahkan kontrol keyboard
+    document.addEventListener('keydown', function(e) {
+        const modal = document.getElementById("imageModal");
+        if (modal.style.display === "flex") {
+            if (e.key === "ArrowLeft") navigateModal(-1);
+            if (e.key === "ArrowRight") navigateModal(1);
+            if (e.key === "Escape") closeModal();
+        }
+    });
+</script>
 </body>
 </html>
