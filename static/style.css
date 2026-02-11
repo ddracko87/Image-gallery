@@ -1,0 +1,198 @@
+/* --- TEMA UTAMA DARK MODE --- */
+body {
+    background-color: #121212; /* Hitam pekat */
+    color: #e0e0e0; /* Putih keabuan agar tidak silau */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 20px;
+}
+
+h1, h2 {
+    color: #ffffff;
+    border-bottom: 2px solid #333;
+    padding-bottom: 10px;
+}
+
+/* Navigasi */
+nav {
+    background: #1e1e1e;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+nav a {
+    color: #bb86fc; /* Warna ungu khas dark mode */
+    text-decoration: none;
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+nav a:hover {
+    color: #03dac6; /* Warna teal saat di-hover */
+}
+
+/* --- GRID GALERI --- */
+.gallery-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+    padding-top: 20px;
+}
+
+.gallery-item {
+    background-color: #1e1e1e;
+    border-radius: 10px;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid #333;
+}
+
+.gallery-item:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+    border-color: #bb86fc;
+}
+
+.gallery-item img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover; /* Gambar tetap proporsional dalam kotak */
+    display: block;
+}
+
+/* --- MODAL / LIGHTBOX --- */
+.modal {
+    display: none; /* <-- Biarkan ini saja di sini */
+    position: fixed; 
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    background-color: rgba(0, 0, 0, 0.95);
+    justify-content: center; /* Properti flexbox lainnya tetap aman */
+    align-items: center;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.modal-content {
+    max-width: 90%;
+    max-height: 80%;
+    border-radius: 5px;
+    box-shadow: 0 0 20px rgba(187, 134, 252, 0.3);
+}
+
+/* Caption Nama File */
+#caption {
+    margin-top: 15px;
+    color: #ccc;
+    font-size: 14px;
+}
+
+/* Tombol Navigasi Modal */
+.close {
+    position: absolute;
+    top: 20px;
+    right: 35px;
+    color: #fff;
+    font-size: 40px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.prev, .next {
+    cursor: pointer;
+    position: absolute;
+    top: 50%;
+    width: auto;
+    padding: 16px;
+    margin-top: -50px;
+    color: white;
+    font-weight: bold;
+    font-size: 30px;
+    transition: 0.3s ease;
+    border-radius: 0 3px 3px 0;
+    user-select: none;
+}
+
+.next {
+    right: 20px;
+    border-radius: 3px 0 0 3px;
+}
+
+.prev {
+    left: 20px;
+}
+
+.prev:hover, .next:hover {
+    background-color: rgba(187, 134, 252, 0.5);
+}
+
+/* List Subfolder */
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+ul li {
+    background: #252525;
+    margin: 5px 0;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+ul li a {
+    color: #e0e0e0;
+    text-decoration: none;
+}
+
+ul li:hover {
+    background: #333;
+}
+
+/* Gaya umum body, h1, nav sudah tercakup di bagian atas CSS */
+
+.folder-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.folder-list li {
+    background: #1e1e1e;
+    margin: 10px 0;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #333;
+    transition: background-color 0.3s ease;
+}
+
+.folder-list li:hover {
+    background-color: #333;
+}
+
+.folder-list li a {
+    color: #bb86fc; /* Warna link folder */
+    text-decoration: none;
+    font-size: 1.1em;
+    display: block;
+}
+
+.folder-list li a:hover {
+    text-decoration: underline;
+}
+
+/* Sedikit styling untuk username yang muncul di header */
+.username-display {
+    float: right;
+    color: #03dac6; /* Warna teal */
+    font-weight: bold;
+}
+
+/* Sedikit styling untuk username yang muncul di header */
+.username-display {
+    float: right;
+    color: #03dac6; /* Warna teal */
+    font-weight: bold;
+}

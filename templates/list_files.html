@@ -1,0 +1,173 @@
+<!-- templates/list_files.html -->
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galeri: {{ folder_name }}</title>
+    <link rel="stylesheet" href="/static/style.css?v=20240726">
+</head>
+<body>
+    <nav>
+        <a href="/">🏠 Menu Utama</a> | 
+        <a href="javascript:history.back()">⬅️ Kembali</a>
+    </nav>
+    
+    <h1>Galeri: {{ folder_name }}</h1>
+
+    <!-- --- BAGIAN BARU: Tampilkan Subfolder --- -->
+    {% if subfolders %}
+    <h2>Subfolder:</h2>
+    <ul>
+    {% for subfolder in subfolders %}
+        <!-- Hapus garis miring di awal tautan relatif -->
+        <li><a href="/gallery/{{ folder_name }}/{{ subfolder }}">{{ subfolder }}</a></li>
+    {% endfor %}
+</ul>
+    <hr>
+    {% endif %}
+
+    <h2>Gambar:</h2>
+<div class="gallery-container">
+        <!-- Loop gambar yang sudah ada -->
+        {% for file_url in files %}
+    <div class="gallery-item">
+        <img src="{{ file_url }}" 
+             alt="Gambar Galeri"
+             loading="lazy" 
+             onclick="openModal('{{ file_url }}')" 
+             style="cursor: pointer;"> <!-- Tambahkan pointer agar user tahu bisa diklik -->
+             <button onclick="deleteImage('{{ file_url }}')">Hapus</button>
+    </div>
+        {% endfor %}
+</div>
+<!-- KONTROL PAGINATION BARU -->
+    <div class="pagination-controls" style="margin-top: 20px; text-align: center;">
+        {% if has_prev %}
+            <a href="{{ prev_url }}" style="padding: 10px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">
+                &laquo; Previous Page
+            </a>
+        {% else %}
+            <!-- Tombol dinonaktifkan jika tidak ada halaman sebelumnya -->
+            <span style="padding: 10px; background-color: #aaa; color: white; border-radius: 5px; cursor: not-allowed;">
+                &laquo; Previous Page
+            </span>
+        {% endif %}
+
+        <span style="margin: 0 15px;">Page {{ page }}</span>
+
+        {% if has_next %}
+            <a href="{{ next_url }}" style="padding: 10px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">
+                Next Page &raquo;
+            </a>
+        {% else %}
+             <!-- Tombol dinonaktifkan jika tidak ada halaman berikutnya -->
+            <span style="padding: 10px; background-color: #aaa; color: white; border-radius: 5px; cursor: not-allowed;">
+                Next Page &raquo;
+            </span>
+        {% endif %}
+    </div>
+
+    <!-- --- BAGIAN BARU: STRUKTUR MODAL/LIGHTBOX --- -->
+    <div id="imageModal" class="modal">
+    <span class="close" onclick="closeModal()">&times;</span>
+    
+    <!-- Tambahkan Panah Navigasi di Sini -->
+    <a class="prev" onclick="changeImage(-1)">&#10094;</a>
+    <a class="next" onclick="changeImage(1)">&#10095;</a>
+
+    <img class="modal-content" id="img01">
+    <div id="caption"></div>
+</div>
+    <!-- --- AKHIR BAGIAN BARU --- -->
+
+    <!-- --- BAGIAN BARU: SCRIPT JAVASCRIPT --- -->
+    <script>
+        var modal = document.getElementById("imageModal");
+        var modalImg = document.getElementById("img01");
+        // Dapatkan elemen caption
+        var captionText = document.getElementById("caption");
+        
+        var galleryItems = document.querySelectorAll('.gallery-item img');
+        var imageUrls = Array.from(galleryItems).map(img => img.src);
+        var currentIndex = 0;
+
+        // Fungsi utilitas untuk mengekstrak nama file dari URL
+        function extractFilename(url) {
+            // Mengambil bagian setelah slash terakhir
+            var filename = url.substring(url.lastIndexOf('/') + 1);
+            // Mendekode URL-encoded characters (%20 menjadi spasi, dll)
+            return decodeURIComponent(filename);
+        }
+
+        function openModal(imageUrl) {
+            modal.style.display = "flex";
+            modalImg.src = imageUrl;
+            currentIndex = imageUrls.indexOf(imageUrl);
+            // Set caption saat modal dibuka
+            captionText.innerHTML = extractFilename(imageUrl);
+        }
+
+        function closeModal() {
+            modal.style.display = "none";
+        }
+
+        function changeImage(delta) {
+            currentIndex += delta;
+
+            if (currentIndex >= imageUrls.length) {
+                currentIndex = 0;
+            } else if (currentIndex < 0) {
+                currentIndex = imageUrls.length - 1;
+            }
+
+            var newImageUrl = imageUrls[currentIndex];
+            modalImg.src = newImageUrl;
+            // Set caption saat gambar berubah
+            captionText.innerHTML = extractFilename(newImageUrl);
+        }
+
+        // Tutup modal jika user klik di luar konten gambar
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+    document.addEventListener('keydown', function(e) {
+    if (modal.style.display === "flex") {
+        if (e.key === "ArrowLeft") changeImage(-1);
+        if (e.key === "ArrowRight") changeImage(1);
+        if (e.key === "Escape") closeModal();
+    }
+});
+
+ function deleteImage(relativeFilePath) {
+
+        if (confirm("Apakah Anda yakin ingin menghapus gambar ini?")) {
+            // 1. Hapus prefix '/view/' jika ada agar sesuai dengan IMAGE_DIRECTORY di backend
+                let cleanPath = relativeFilePath;
+                if (cleanPath.startsWith('/view/')) {
+                    cleanPath = cleanPath.replace('/view/', '');
+                }
+
+                // 2. Encode path-nya
+                const encodedPath = encodeURIComponent(cleanPath);
+            fetch(`/files/${encodedPath}`, { method: 'DELETE' })
+                .then(response => {
+                    if (response.ok) {
+                        location.reload(); // Muat ulang halaman setelah penghapusan
+                    } else {
+                        alert("Gagal menghapus gambar.");
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert("Terjadi kesalahan saat menghapus gambar.");
+                });
+        }
+    }
+    </script>
+    <!-- --- AKHIR BAGIAN BARU --- -->
+
+</body>
+</html>
