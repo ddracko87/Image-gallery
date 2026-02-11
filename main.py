@@ -57,7 +57,7 @@ def login_page(request: Request):
 
 @app.post("/token")
 def login_action(form_data: OAuth2PasswordRequestForm = Depends()):
-    if form_data.username == "dracko" and form_data.password == "dracko120287":
+    if form_data.username == "admin" and form_data.password == "admin":
         access_token = create_access_token(data={"sub": form_data.username})
         
         response = RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
