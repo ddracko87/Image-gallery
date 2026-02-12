@@ -231,3 +231,60 @@ ul li:hover {
     background-color: #cc0000 !important;
     transform: scale(1.05);
 }
+
+/* --- RESPONSIVE DESIGN --- */
+
+/* Penyesuaian untuk Tablet (max-width: 768px) */
+@media (max-width: 768px) {
+    .header-container {
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
+    }
+
+    .user-greeting {
+        display: block;
+        margin-left: 0;
+        margin-top: 5px;
+    }
+
+    .gallery-container {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 10px;
+    }
+
+    .modal-content {
+        width: 95%;
+    }
+}
+
+/* Penyesuaian untuk HP (max-width: 480px) */
+@media (max-width: 480px) {
+    body {
+        padding: 10px;
+    }
+
+    .header-left h1 {
+        font-size: 1.2rem;
+    }
+
+    .gallery-container {
+        grid-template-columns: 1fr 1fr; /* 2 Kolom tetap di layar kecil */
+    }
+
+    .prev, .next {
+        padding: 10px;
+        font-size: 20px;
+    }
+    
+    .logout-button {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+/* Memastikan Gambar Modal Responsif */
+.modal-content {
+    object-fit: contain; /* Mencegah gambar terpotong di layar HP */
+}
+
