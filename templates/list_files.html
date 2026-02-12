@@ -39,9 +39,12 @@
         <!-- 1. Tampilan Gambar Utama (Klik untuk Popup) -->
         <div class="main-display" style="width: 100%; margin-bottom: 20px; text-align: center;">
             {% if files %}
+                <button onclick="navigateMain(-1)" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); color: white; border: none; padding: 15px; cursor: pointer; border-radius: 50%; z-index: 10;">❮</button>
+                
                 <img id="active-image" src="{{ files[0] }}" alt="Main View" 
                      onclick="openLightbox()" 
                      style="width: 100%; max-height: 500px; object-fit: contain; border-radius: 8px; border: 1px solid #444; cursor: zoom-in;">
+                <button onclick="navigateMain(1)" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); color: white; border: none; padding: 15px; cursor: pointer; border-radius: 50%; z-index: 10;">❯</button>
             {% endif %}
         </div>
 
@@ -173,6 +176,52 @@
             if (e.key === "Escape") closeModal();
         }
     });
+
+    // Tambahkan atau gabungkan dengan event listener keydown yang sudah ada
+    document.addEventListener('keydown', function(e) {
+        const modal = document.getElementById("imageModal");
+        
+        // CEK: Jika modal sedang TIDAK terbuka (display none atau kosong)
+        if (modal.style.display !== "flex") {
+            if (e.key === "ArrowLeft") {
+                navigateMain(-1);
+            } else if (e.key === "ArrowRight") {
+                navigateMain(1);
+            }
+        }
+        
+        // Logika modal yang sudah ada tetap dipertahankan
+        if (modal.style.display === "flex") {
+            if (e.key === "ArrowLeft") navigateModal(-1);
+            if (e.key === "ArrowRight") navigateModal(1);
+            if (e.key === "Escape") closeModal();
+        }
+    });
+    // Fungsi Navigasi Utama (Untuk sinkronisasi tombol panah & thumbnail)
+    function navigateMain(step) {
+        currentIndex += step;
+
+        // Loop index jika sudah sampai ujung
+        if (currentIndex >= imageUrls.length) {
+            currentIndex = 0;
+        } else if (currentIndex < 0) {
+            currentIndex = imageUrls.length - 1;
+        }
+
+        const thumbs = document.querySelectorAll('.thumb-img');
+        const targetThumb = thumbs[currentIndex];
+        
+        // Jalankan fungsi updatePreview yang sudah Anda miliki
+        updatePreview(targetThumb, currentIndex);
+
+        // Tambahan: Pastikan thumbnail yang terpilih otomatis scroll ke tengah layar
+        targetThumb.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest',
+            inline: 'center'
+        });
+    }
+
 </script>
 </body>
 </html>
