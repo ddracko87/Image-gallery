@@ -221,6 +221,38 @@
             inline: 'center'
         });
     }
+        // Gunakan ID yang sesuai dengan HTML Anda yaitu 'imageModal'
+        const modalElement = document.getElementById('imageModal');
+        let touchstartX = 0;
+        let touchendX = 0;
+
+        // Ambil posisi awal sentuhan
+        modalElement.addEventListener('touchstart', (e) => {
+            touchstartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+
+        // Ambil posisi akhir sentuhan dan tentukan arah swipe
+        modalElement.addEventListener('touchend', (e) => {
+            touchendX = e.changedTouches[0].screenX;
+            handleSwipe();
+        }, { passive: true });
+
+        function handleSwipe() {
+            const threshold = 50; // Sensitivitas geser
+            
+            // Pastikan swipe hanya berfungsi jika modal sedang terbuka
+            if (modalElement.style.display === "flex") {
+                if (touchendX < touchstartX - threshold) {
+                    // Swipe ke kiri -> Gambar Berikutnya
+                    navigateModal(1); 
+                }
+                
+                if (touchendX > touchstartX + threshold) {
+                    // Swipe ke kanan -> Gambar Sebelumnya
+                    navigateModal(-1);
+                }
+            }
+        }
 
 </script>
 </body>
